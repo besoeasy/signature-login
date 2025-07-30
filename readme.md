@@ -2,10 +2,6 @@
 
 **Cryptographic signature-based authentication using secp256k1 elliptic curve digital signatures**
 
-[
-[
-[
-
 > **Simple, secure, and cross-platform cryptographic authentication without passwords**
 
 ## ✨ Features

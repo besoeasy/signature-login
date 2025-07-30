@@ -1,4 +1,4 @@
-# 🔐 Signature-Based Authentication
+# 🔐 Signature Login - Signature-Based Authentication
 
 **Cryptographic signature-based authentication using secp256k1 elliptic curve digital signatures**
 

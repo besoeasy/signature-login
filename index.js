@@ -1,7 +1,7 @@
 // Signature-Login: Cross-platform cryptographic login/verify module
 import * as secp from "@noble/secp256k1";
 import { hmac } from "@noble/hashes/hmac";
-import { sha256 as nobleSha256 } from "@noble/hashes/sha256";
+import { sha256 as nobleSha256 } from "@noble/hashes/sha2";
 import { createHash, randomBytes as nodeRandomBytes } from "crypto";
 import { TextEncoder } from "util";
 

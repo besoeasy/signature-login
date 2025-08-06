@@ -42,6 +42,13 @@ export function generateKeyPair() {
   };
 }
 
+// --- Get Public Key from Private Key ---
+export function getPublicKey(privateKeyHex) {
+  const privateKeyBytes = hexToBytes(privateKeyHex);
+  const publicKeyBytes = secp.getPublicKey(privateKeyBytes, true); // compressed
+  return bytesToHex(publicKeyBytes);
+}
+
 // --- Hashing (SHA-256) ---
 export async function sha256(msg) {
   const encoded = encoder.encode(msg);
@@ -78,9 +85,7 @@ export async function verify(message, signatureHex, publicKeyHex) {
 
 // --- Auth Header Helper ---
 export async function createAuth(privateKeyHex) {
-  const privateKeyBytes = hexToBytes(privateKeyHex);
-  const publicKeyBytes = secp.getPublicKey(privateKeyBytes, true);
-  const publicKeyHex = bytesToHex(publicKeyBytes);
+  const publicKeyHex = getPublicKey(privateKeyHex);
 
   const timestamp = Date.now();
   const nonceBytes = randomBytes(16);

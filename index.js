@@ -2,14 +2,20 @@
 import * as secp from "@noble/secp256k1";
 import { hmac } from "@noble/hashes/hmac";
 import { sha256 as nobleSha256 } from "@noble/hashes/sha2";
-import { createHash, randomBytes as nodeRandomBytes } from "crypto";
-import { TextEncoder } from "util";
 
 // Set up HMAC for secp256k1
 secp.etc.hmacSha256Sync = (key, ...msgs) => hmac(nobleSha256, key, secp.etc.concatBytes(...msgs));
 
-// Browser compatibility
-const encoder = typeof window !== "undefined" ? new window.TextEncoder() : new TextEncoder();
+// Browser compatibility helper for TextEncoder
+function getTextEncoder() {
+  if (typeof window !== "undefined") {
+    return new window.TextEncoder();
+  } else {
+    // Dynamic import for Node.js only
+    const { TextEncoder } = require("util");
+    return new TextEncoder();
+  }
+}
 
 // Helper function to convert bytes to hex
 function bytesToHex(bytes) {
@@ -28,6 +34,8 @@ function randomBytes(length) {
     window.crypto.getRandomValues(bytes);
     return bytes;
   } else {
+    // Dynamic require for Node.js only
+    const { randomBytes: nodeRandomBytes } = require("crypto");
     return new Uint8Array(nodeRandomBytes(length));
   }
 }
@@ -51,10 +59,12 @@ export function getPublicKey(privateKeyHex) {
 
 // --- Hashing (SHA-256) ---
 export async function sha256(msg) {
+  const encoder = getTextEncoder();
   const encoded = encoder.encode(msg);
   
   if (typeof window === "undefined") {
-    // Node.js
+    // Node.js - dynamic require
+    const { createHash } = require("crypto");
     return new Uint8Array(createHash("sha256").update(encoded).digest());
   } else {
     // Browser

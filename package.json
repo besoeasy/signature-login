@@ -1,6 +1,6 @@
 {
   "name": "signature-login",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "description": "signature-login",
   "main": "index.js",
   "type": "module",

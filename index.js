@@ -7,13 +7,13 @@ import { sha256 as nobleSha256 } from "@noble/hashes/sha2";
 secp.etc.hmacSha256Sync = (key, ...msgs) => hmac(nobleSha256, key, secp.etc.concatBytes(...msgs));
 
 // Browser compatibility helper for TextEncoder
-function getTextEncoder() {
+async function getTextEncoder() {
   if (typeof window !== "undefined") {
     return new window.TextEncoder();
   } else {
     // Dynamic import for Node.js only
-    const { TextEncoder } = require("util");
-    return new TextEncoder();
+    const util = await import("node:util");
+    return new util.TextEncoder();
   }
 }
 
@@ -28,15 +28,15 @@ function hexToBytes(hex) {
 }
 
 // Helper function to generate random bytes
-function randomBytes(length) {
+async function randomBytes(length) {
   if (typeof window !== "undefined" && window.crypto) {
     const bytes = new Uint8Array(length);
     window.crypto.getRandomValues(bytes);
     return bytes;
   } else {
-    // Dynamic require for Node.js only
-    const { randomBytes: nodeRandomBytes } = require("crypto");
-    return new Uint8Array(nodeRandomBytes(length));
+    // Dynamic import for Node.js only
+    const crypto = await import("node:crypto");
+    return new Uint8Array(crypto.randomBytes(length));
   }
 }
 
@@ -59,13 +59,13 @@ export function getPublicKey(privateKeyHex) {
 
 // --- Hashing (SHA-256) ---
 export async function sha256(msg) {
-  const encoder = getTextEncoder();
+  const encoder = await getTextEncoder();
   const encoded = encoder.encode(msg);
   
   if (typeof window === "undefined") {
-    // Node.js - dynamic require
-    const { createHash } = require("crypto");
-    return new Uint8Array(createHash("sha256").update(encoded).digest());
+    // Node.js - dynamic import
+    const crypto = await import("node:crypto");
+    return new Uint8Array(crypto.createHash("sha256").update(encoded).digest());
   } else {
     // Browser
     const hash = await window.crypto.subtle.digest("SHA-256", encoded);
@@ -98,7 +98,7 @@ export async function createAuth(privateKeyHex) {
   const publicKeyHex = getPublicKey(privateKeyHex);
 
   const timestamp = Date.now();
-  const nonceBytes = randomBytes(16);
+  const nonceBytes = await randomBytes(16);
   const nonce = bytesToHex(nonceBytes);
   const message = `${timestamp}:${nonce}`;
   
